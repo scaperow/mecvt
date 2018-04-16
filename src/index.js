@@ -2,12 +2,27 @@ import less from './style/site.less';
 import $ from 'jquery';
 import JsonEditor from 'json-editor';
 import ContainerEngine from './templates/container.html';
-import layui from 'layui';
+import layui from 'layui-src';
 
 (function() {
     'use strict';
-
-    
+    layui.use('layer', function(){ //独立版的layer无需执行这一句
+        var $ = layui.jquery, layer = layui.layer; //独立版的layer无需执行这一句
+         
+      layer.open({
+        type: 1
+        ,offset: 'rt' //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+        ,id: 'container_'+type //防止重复弹出
+        ,content: '<div style="padding: 20px 100px;">test</div>'
+        ,btn: '关闭全部'
+        ,btnAlign: 'c' //按钮居中
+        ,shade: 0 //不显示遮罩
+        ,yes: function(){
+          layer.closeAll();
+        }
+      });
+    });
+    /*
 
     var $summary = null;
     var editor = null;
@@ -203,4 +218,5 @@ import layui from 'layui';
 
     writeScript();
     writeControl();
+    */
 })();
