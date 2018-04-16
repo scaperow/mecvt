@@ -1,0 +1,28 @@
+{
+  "name": "scaperow",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "layui-src": "^2.2.5"
+  },
+  "devDependencies": {
+    "css-loader": "^0.28.11",
+    "expose-loader": "^0.7.5",
+    "font-awesome": "^4.7.0",
+    "jquery": "^3.3.1",
+    "json-editor": "^0.7.28",
+    "less": "^3.0.1",
+    "less-loader": "^4.1.0",
+    "raw-loader": "^0.5.1",
+    "style-loader": "^0.20.3",
+    "webpack": "^4.5.0",
+    "webpack-cli": "^2.0.14"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack "
+  },
+  "author": "scaperow@hotmail.com",
+  "license": "ISC"
+}

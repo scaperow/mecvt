@@ -1,15 +1,14 @@
-// ==UserScript==
-// @name         简历通
-// @namespace    www.zhipin.com
-// @version      0.1
-// @description  各大平台简历同步助手
-// @author       scaperow
-// @match        www.zhipin.com/geek/new/index/resume
-// @grant        none
-// ==/UserScript==
+import less from './style/site.less';
+import $ from 'jquery';
+import JsonEditor from 'json-editor';
+import ContainerEngine from './templates/container.html';
+import layui from 'layui';
 
 (function() {
     'use strict';
+
+    
+
     var $summary = null;
     var editor = null;
     var form = {
@@ -154,7 +153,7 @@
                 contentOverflow: 'scroll',
                 headerToolbar: [
                     {
-                        item:     "<button class='btn'><span class='fa fa-arrow-circle-left'> 向左33同步</span></button>",
+                        item:     "<button class='btn'><span class='fa fa-arrow-circle-left'> 向左同步</span></button>",
                         event:    "click",
                         callback: function (event) {event.data.content.append("<p>You clicked on the menu ...</p>"); }
                     },
