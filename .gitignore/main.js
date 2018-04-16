@@ -154,7 +154,7 @@
                 contentOverflow: 'scroll',
                 headerToolbar: [
                     {
-                        item:     "<button class='btn'><span class='fa fa-arrow-circle-left'> 向左同步</span></button>",
+                        item:     "<button class='btn'><span class='fa fa-arrow-circle-left'> 向左33同步</span></button>",
                         event:    "click",
                         callback: function (event) {event.data.content.append("<p>You clicked on the menu ...</p>"); }
                     },
