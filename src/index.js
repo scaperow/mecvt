@@ -1,26 +1,59 @@
-import less from './style/site.less';
+
 import $ from 'jquery';
 import JsonEditor from 'json-editor';
-import ContainerEngine from './templates/container.html';
+import './style/site.less';
+import ContainerTemplate from './templates/container.html';
+import form from './form.js';
+
+(function () {
+    const $container = $(ContainerTemplate);
+    $(document.body).append($container);
+
+    const editor = new JSONEditor($("#cvt_fields")[0], {
+        schema: form,
+        disable_edit_json: true,
+        disable_properties: true,
+        disable_collapse: true,
+        input_width: '180px',
+        theme: 'html'
+    });
+
+    $('#btn_side_right').click(() => {
+        for (var key in form.properties) {
+            let i = form.properties[key];
+            let adapter = null;
+            let val = null;
+            let node = editor.getEditor('root.' + key);
+
+            if (i.hasOwnProperty('adapter')) {
+                adapter = i['adapter'];
+                val = '';
+
+                try {
+                    switch (typeof adapter.matcher) {
+                        case 'string':
+                            val = $(adapter.matcher).text();
+                            if (!adapter.notTrim) {
+                                val = val.trim();
+                            }
+
+                            break;
+
+                        case 'function':
+                            val = adapter.matcher();
 
 
+                            break;
+                    }
+                } catch (e) {
 
-layui.use('layer', function () { //独立版的layer无需执行这一句
-    var $ = layui.jquery, layer = layui.layer; //独立版的layer无需执行这一句
+                }
 
-    layer.open({
-        type: 1
-        , offset: 'rt' //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
-        , id: 'container_' + type //防止重复弹出
-        , content: '<div style="padding: 20px 100px;">test</div>'
-        , btn: '关闭全部'
-        , btnAlign: 'c' //按钮居中
-        , shade: 0 //不显示遮罩
-        , yes: function () {
-            layer.closeAll();
+                node.setValue(val);
+            }
         }
     });
-});
+})();
     /*
 
     var $summary = null;
