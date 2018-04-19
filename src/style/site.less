@@ -1,47 +1,93 @@
-div#cvt {
-    background: #fff;
+#cvt_app {
     position: fixed;
-    right: 30px;
-    top: 30px;
-    bottom: 30px;
-    z-index: 99999;
-    border-radius: 12px;
-    border: solid 3px #eee;
-    padding: 12px;
-    width: 300px;
-    font-size: 12px;
-    overflow-y: auto;
-    .header {
-        height: 40px;
+    transition: transform 0.3s;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: row;
+    z-index: 9999999;
+    width: 400px;
+    overflow: hidden;
+    & ::selection {
+        background: lightcoral;
+        color: #fff;
     }
-    .menu {
-        height: 80px;
+    #cvt_slider {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        transition: transform 0.3s;
+        width: 50px;
+        align-items: flex-end;
+        z-index: 9999990;
+        .cvt_button {
+            margin: 6px 0;
+            margin-right: -15px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: lightcoral;
+            z-index: 9999999;
+            text-align: center;
+            line-height: 40px;
+            overflow: hidden;
+            color: #fff;
+            transition: transform 0.1s;
+            &:hover {
+                transform: translateX(-10px);
+            }
+        }
     }
-    #cvt_fields {
-        background: #eee;
-        padding: 0 6px;
-        .row {
-            margin-top: 12px;
-            .form-control {
-                label {
-                    color: #333;
-                    display: block;
-                    margin-bottom: 12px;
-                    font-weight: normal;
-                }
-                input,
-                select,
-                textarea {
-                    height: 30px;
-                    outline: none;
-                    border: none;
-                    border-radius: 6px;
-                    padding: 0 9px;
-                }
-                textarea {
-                    height: 60px;
-                    padding-top: 9px;
-                    padding-bottom: 9px;
+    div#cvt {
+        flex-grow: 1;
+        background: #fff;
+        border-radius: 12px;
+        border: solid 3px lightcoral;
+        padding: 12px;
+        font-size: 12px;
+        overflow-y: auto;
+        z-index: 9999991;
+        &::-webkit-scrollbar {
+            width: 5px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 20px;
+        }
+        .header {
+            height: 40px;
+        }
+        .menu {
+            height: 80px;
+        }
+        #cvt_fields {
+            background: #eee;
+            padding: 0 6px;
+            .row {
+                margin-top: 12px;
+                .form-control {
+                    label {
+                        color: lightcoral;
+                        display: block;
+                        margin-bottom: 12px;
+                        font-weight: normal;
+                    }
+                    input,
+                    select,
+                    textarea {
+                        height: 30px;
+                        outline: none;
+                        border: none;
+                        border-radius: 6px;
+                        padding: 0 9px;
+                    }
+                    textarea {
+                        height: 60px;
+                        padding-top: 9px;
+                        padding-bottom: 9px;
+                    }
                 }
             }
         }

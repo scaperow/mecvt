@@ -5,7 +5,18 @@ import './style/site.less';
 import ContainerTemplate from './templates/container.html';
 import form from './form.js';
 
+
 (function () {
+    $("head").append("<link>");
+    const css = $("head").children(":last");
+    css.attr({
+        rel: "stylesheet",
+        type: "text/css",
+        href: "https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    });
+
+    let isToggled = false;
+
     const $container = $(ContainerTemplate);
     $(document.body).append($container);
 
@@ -14,42 +25,59 @@ import form from './form.js';
         disable_edit_json: true,
         disable_properties: true,
         disable_collapse: true,
+        disable_array_add: true,
+        disable_array_delete: true,
+        disable_array_reorder: true,
+        form_name_root: '',
+        show_errors: '',
         input_width: '180px',
         theme: 'html'
     });
 
-    $('#btn_side_right').click(() => {
-        for (var key in form.properties) {
-            let i = form.properties[key];
-            let adapter = null;
-            let val = null;
-            let node = editor.getEditor('root.' + key);
+    $('#cvt_toggle_btn').click(() => {
+        if (isToggled) {
+            $('#cvt_app').css("transform", "translateX(0%)");
+            $('#cvt_toggle_btn .fa').attr("class", "fa fa-caret-right");
+        } else {
+            $('#cvt_app').css("transform", "translateX(350px)");
+            $('#cvt_toggle_btn .fa').attr("class", "fa fa-caret-left");
 
-            if (i.hasOwnProperty('adapter')) {
-                adapter = i['adapter'];
+        }
+
+        isToggled = !isToggled;
+    });
+
+    $('#cvt_sync_right_btn').click(() => {
+        for (var key in form.properties) {
+            let property = form.properties[key];
+            let setter = null;
+            let val = null;
+            let fieldEditor = editor.getEditor('root.' + key);
+
+            if (property.hasOwnProperty('setter')) {
+                setter = property['setter'];
                 val = '';
 
                 try {
-                    switch (typeof adapter.matcher) {
+                    switch (typeof setter.matcher) {
                         case 'string':
-                            val = $(adapter.matcher).text();
-                            if (!adapter.notTrim) {
+                            val = $(setter.matcher).text();
+                            if (!setter.notTrim) {
                                 val = val.trim();
                             }
-
                             break;
 
                         case 'function':
-                            val = adapter.matcher();
-
-
+                            val = setter.matcher();
                             break;
                     }
                 } catch (e) {
-
+                    console.error(e);
                 }
 
-                node.setValue(val);
+                console.log(val);
+
+                fieldEditor.setValue(val);
             }
         }
     });
