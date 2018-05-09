@@ -10,15 +10,20 @@ const form = {
         name: {
             title: "姓名",
             type: "string",
+
             setter: {
-                //matcher: 'h2.name',
-                //isNotTrim:false,
                 matcher(tag) {
                     return $('h2.name').prop('firstChild').nodeValue;
                 }
             },
             getter: {
 
+            },
+            getTextControl(){
+
+            },
+            getValueControl(){
+                
             }
         },
         gender: {
@@ -105,7 +110,8 @@ const form = {
             type: "string"
         },
 
-        experience: {
+
+        career: {
             type: "array",
             title: "工作经历",
             items: {
@@ -150,7 +156,7 @@ const form = {
                         experienceDom = experiences[i];
                         experienceItem = {
                             company: $(experienceDom).find('h4.name').text().trim(),
-                            position:'',
+                            position: '',
                             department: "",
                             works: "",
                             achievement: "",
@@ -219,6 +225,80 @@ const form = {
                     }
 
                     return intents;
+                }
+            }
+        },
+        experience: {
+            type: "array",
+            title: "项目经验",
+            items: {
+                type: "object",
+                title: "经验",
+                properties: {
+                    type: "object",
+                    title: "经验",
+                    name: {
+                        title: "项目名称",
+                        type: "string"
+                    },
+                    role: {
+                        title: "担任角色",
+                        type: "string"
+                    },
+                    external: {
+                        title: "附加内容",
+                        type: "array",
+                        items: {}
+                    },
+                    startTime: {
+                        title: "开始时间",
+                        type: "string"
+                    },
+                    finishTime: {
+                        title: "结束时间",
+                        type: "string"
+                    },
+                    description: {
+                        title: "描述",
+                        type: "string"
+                    },
+                    achievement: {
+                        title: "业绩",
+                        type: "string"
+                    }
+                }
+
+            },
+            setter: {
+                matcher() {
+                    let projects = $('#resume-project').find('[id^=row-]');
+                    let projectDom = null;
+                    let experienceItem = null;
+                    let experiences = [];
+                    for (var i = 0; i < projects.length; i++) {
+                        projectDom = projects[i];
+                        experienceItem = {
+                            name: $(experienceDom).find('h4.name')[0].firstChild,
+                            role: $(experienceDom).find('h4.name')[0].lastChild,
+                        }
+
+                        let timeRangeText = $(experienceDom).find('span.period').text();
+                        let timeRanges = timeRangeText.split('-');
+                        if (timeRanges.length > 1) {
+                            experienceItem.startTime = timeRanges[0];
+                            experienceItem.finishTime = timeRanges[1];
+                        }
+
+                        experienceItem.description = $(experienceDom).find('div.text')[0].find('p').html().trim().replace(/<p>/g, '').replace(/<\/p>/g, '').replace(/<br>/g, '\r\n');
+                        experienceItem.achievement = $(experienceDom).find('div.text')[1].find('p').html().trim().replace(/<p>/g, '').replace(/<\/p>/g, '').replace(/<br>/g, '\r\n');
+
+                        experiences.push(experienceItem);
+
+                    }
+
+
+
+                    return experiences;
                 }
             }
         }
