@@ -19,11 +19,11 @@ const form = {
             getter: {
 
             },
-            getTextControl(){
+            getText() {
 
             },
-            getValueControl(){
-                
+            getValue() {
+
             }
         },
         gender: {

@@ -51,7 +51,10 @@ const adapter = {
     }),
     summary: new AdapterField(runner = clickBasicService, valueCtrlFunc = () => {
         return 'textarea[name="advantage"]';
-    })
+    }),
+    jobIntension:{
+        
+    }
 };
 
 
