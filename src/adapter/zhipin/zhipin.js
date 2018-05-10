@@ -1,5 +1,6 @@
 import AdapterField from '../../model/Adapter';
 import ReadyService from '../../model/ReadyService';
+import AdapterCollection from '../../model/Adapter';
 
 const ClickBasicService = function () {
 
@@ -23,12 +24,11 @@ const ClickResumeService = function () {
 ClickResumeService.prototype = ReadyService.prototype;
 
 const ClickExperienceService = function () {
-    this.runner = function () {
+    this.runner = (context) => {
         return new Promise((resolve, reject) => {
-            $().click();
-            resolve();
+            context.parentTag.find('.op .fz-resume.fz-edit').click();
         });
-    };
+    }
 }
 ClickExperienceService.prototype = ReadyService.prototype;
 
@@ -57,7 +57,7 @@ const adapter = {
                 return null;
         }
     }),
-    mail: new AdapterField(runner = clickBasicService, runner = clickBasicService, textCtrlFunc = () => {
+    mail: new AdapterField(runner = clickBasicService, textCtrlFunc = () => {
         return $('input[type="mail"]');
     }),
     birthday: new AdapterField(runner = clickBasicService, valueCtrlFunc = () => {
@@ -66,30 +66,56 @@ const adapter = {
     summary: new AdapterField(runner = clickBasicService, valueCtrlFunc = () => {
         return $('textarea[name="advantage"]');
     }),
-    jobIntension: {
-        items: {
-            properties: {
-                name: new AdapterField(runner = clickExperienceService,
-                    valueCtrlFunc = () => {
-
-                    },
-                    textCtrlFunc = () => {  
-
-                    })
-            }
-        },
-        getItemsLength:()=>{
-            
-        },
-        getNewItem: () => {
-            return new Promise((resolve, reject) => {
-
-            });
-        },
-        deleteItem: () => {
-
+    intension: new AdapterCollection(() => {
+        return $('#resume-project [id=^row-]')
+    }, {
+            name: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
+                return $('[ka="project-name"]');
+            }),
+            role: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
+                return $('[ka="project-role"]');
+            }),
+            url: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
+                return $('[ka="project-url"]');
+            }),
+            startTime: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
+                return $('[ka="project-start-date"]');
+            }),
+            finishTime: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
+                return $('[ka="project-end-date"]');
+            }),
+            description: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
+                return $('[ka="project-description"]');
+            }),
+            performance: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
+                return ('[ka="project-performance"]');
+            })
         }
-    }
+    ),
+    careers: new AdapterCollection(() => {
+        return $('#resume-project [id=^row-]');
+    }, {
+            company: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
+                return $('[ka="work-company"]');
+            }),
+            position: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
+
+                return $('[ka="work-position-name"]');
+            }),
+            department: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
+                return $('[ka="work-position"]');
+            }),
+            industry: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
+                return $('[ka="work-industry"]')
+            }),
+            works: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
+                return $('[ka="work-responsibility"]');
+            }),
+            performance: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
+                return $('[ka="work-performance"]');
+            })
+        }
+    )
 };
 
 

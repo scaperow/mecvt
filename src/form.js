@@ -132,11 +132,15 @@ const form = {
                         title: "部门",
                         type: "string"
                     },
+                    industry: {
+                        title: "行业",
+                        type: "string"
+                    },
                     works: {
                         title: "工作内容",
                         type: "string"
                     },
-                    achievement: {
+                    performance: {
                         title: "业绩",
                         type: "string"
                     },

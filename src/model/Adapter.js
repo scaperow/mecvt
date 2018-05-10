@@ -75,8 +75,11 @@ AdapterField.prototype.getValue = function () {
 };
 
 
-const AdapterCollection = function ({length}) {
-    
+const AdapterCollection = function (getChildrensFunc, childFields) {
+    this.getChildrens = getChildrensFunc;
+    this.childFields = childFields;
 };
 
+
 export default AdapterField;
+export default AdapterCollection;
