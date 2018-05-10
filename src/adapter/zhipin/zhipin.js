@@ -22,17 +22,31 @@ const ClickResumeService = function () {
 };
 ClickResumeService.prototype = ReadyService.prototype;
 
+const ClickExperienceService = function () {
+    this.runner = function () {
+        return new Promise((resolve, reject) => {
+            $().click();
+            resolve();
+        });
+    };
+}
+ClickExperienceService.prototype = ReadyService.prototype;
+
+const clickBasicService = new ClickBasicService();
+const clickExperienceService = new ClickExperienceService();
+
+
 const adapter = {
     tel: new AdapterField(valueCtrlFunc = () => {
-        return '.fz-resume .fz-tel';
+        return $('.fz-resume .fz-tel');
     }),
     name: new AdapterField(runner = clickBasicService, valueCtrlFunc = () => {
-        return 'input[name="name"]';
+        return $('input[name="name"]');
     }),
     gender: new AdapterField(runner = clickBasicService, textCtrlFunc = () => {
-        return '.radio-list .radio-checked';
+        return $('.radio-list .radio-checked');
     }, valueCtrlFunc = () => {
-        return '.radio-list input[type="hidden" name="gender"]';
+        return $('.radio-list input[type="hidden" name="gender"]');
     }, transferValueFunc = (val) => {
         switch (val) {
             case '男':
@@ -44,16 +58,37 @@ const adapter = {
         }
     }),
     mail: new AdapterField(runner = clickBasicService, runner = clickBasicService, textCtrlFunc = () => {
-        return 'input[type="mail"]';
+        return $('input[type="mail"]');
     }),
     birthday: new AdapterField(runner = clickBasicService, valueCtrlFunc = () => {
-        return 'input[name="birthday"]';
+        return $('input[name="birthday"]');
     }),
     summary: new AdapterField(runner = clickBasicService, valueCtrlFunc = () => {
-        return 'textarea[name="advantage"]';
+        return $('textarea[name="advantage"]');
     }),
-    jobIntension:{
-        
+    jobIntension: {
+        items: {
+            properties: {
+                name: new AdapterField(runner = clickExperienceService,
+                    valueCtrlFunc = () => {
+
+                    },
+                    textCtrlFunc = () => {  
+
+                    })
+            }
+        },
+        getItemsLength:()=>{
+            
+        },
+        getNewItem: () => {
+            return new Promise((resolve, reject) => {
+
+            });
+        },
+        deleteItem: () => {
+
+        }
     }
 };
 
