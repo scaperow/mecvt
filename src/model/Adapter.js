@@ -1,8 +1,8 @@
-const AdapterField = function (runners, valueCtrlFunc, transferValueFunc, textCtrlFunc = valueCtrlFunc) {
-    this.runners = runners;
-    this.getValueCtrl = valueCtrlFunc;
-    this.getTextCtrl = textCtrlFunc;
-    this.transferCtrl = transferValueFunc;
+const AdapterField = function (runner, getValueCtrl, transferValue, getTextCtrl = getValueCtrl) {
+    this.runner = runner;
+    this.getValueCtrl = getValueCtrl;
+    this.getTextCtrl = getTextCtrl;
+    this.transferCtrl = transferValue;
 };
 
 AdapterField.prototype.setValue = function (value) {
@@ -11,14 +11,15 @@ AdapterField.prototype.setValue = function (value) {
             this.getValueCtrl()
                 .then(ctrl => {
                     ctrl.value = val;
+                    resolve(val);
                 })
                 .catch(error => {
                     reject(error);
                 });
         };
 
-        if (typeof (this.transferValueFunc) === Function) {
-            this.transferValueFunc(trasnferredValue)
+        if (typeof (this.transferValue) === Function) {
+            this.transferValue(trasnferredValue)
                 .then(val => {
                     setValueFunction(trasnferredValue);
                 })
@@ -36,6 +37,7 @@ AdapterField.prototype.setText = function (value) {
                 this.getTextCtrl()
                     .then(ctrl => {
                         ctrl.value = val;
+                        resolve(val);
                     })
                     .catch(error => {
                         reject(error);
@@ -51,25 +53,25 @@ AdapterField.prototype.setText = function (value) {
 };
 
 AdapterField.prototype.getText = function () {
-    return new Promise((resolve, resolve) => {
+    return new Promise((resolve, reject) => {
         this.getTextCtrl()
             .then(ctrl => {
                 resolve(ctrl.value);
             })
             .cathch(error => {
-                resolve(error);
+                reject(error);
             });
     });
 };
 
 AdapterField.prototype.getValue = function () {
-    return new Promise((resolve, resolve) => {
+    return new Promise((resolve, reject) => {
         this.getValueCtrl()
             .then(ctrl => {
                 resolve(ctrl.value);
             })
             .cathch(error => {
-                resolve(error);
+                reject(error);
             });
     });
 };
@@ -81,5 +83,4 @@ const AdapterCollection = function (getChildrensFunc, childFields) {
 };
 
 
-export default AdapterField;
-export default AdapterCollection;
+export { AdapterField, AdapterCollection };

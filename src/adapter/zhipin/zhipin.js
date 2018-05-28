@@ -1,11 +1,11 @@
-import AdapterField from '../../model/Adapter';
-import ReadyService from '../../model/ReadyService';
-import AdapterCollection from '../../model/Adapter';
 
+import { AdapterCollection, AdapterField } from '../../model/Adapter';
+
+import ReadyService from '../../model/ReadyService';
 const ClickBasicService = function () {
 
 };
-clickBasicService.prototype = ReadyService.prototype;
+ClickBasicService.prototype = ReadyService.prototype;
 ClickBasicService.prototype.runner = function () {
     return new Promise((resolve, reject) => {
         $('.fz-resume.fz-edit').click();
@@ -37,82 +37,121 @@ const clickExperienceService = new ClickExperienceService();
 
 
 const adapter = {
-    tel: new AdapterField(valueCtrlFunc = () => {
-        return $('.fz-resume .fz-tel');
-    }),
-    name: new AdapterField(runner = clickBasicService, valueCtrlFunc = () => {
-        return $('input[name="name"]');
-    }),
-    gender: new AdapterField(runner = clickBasicService, textCtrlFunc = () => {
-        return $('.radio-list .radio-checked');
-    }, valueCtrlFunc = () => {
-        return $('.radio-list input[type="hidden" name="gender"]');
-    }, transferValueFunc = (val) => {
-        switch (val) {
-            case '男':
-                return 1;
-            case '女':
-                return 0;
-            default:
-                return null;
+    tel: new AdapterField({
+        getValueCtrl: () => {
+            return $('.fz-resume .fz-tel');
         }
     }),
-    mail: new AdapterField(runner = clickBasicService, textCtrlFunc = () => {
-        return $('input[type="mail"]');
+    name: new AdapterField({
+        runner: clickBasicService, getValueCtrl: () => {
+            return $('input[name="name"]');
+        }
     }),
-    birthday: new AdapterField(runner = clickBasicService, valueCtrlFunc = () => {
-        return $('input[name="birthday"]');
+    gender: new AdapterField(
+        {
+            runner: clickBasicService, getTextCtrl: () => {
+                return $('.radio-list .radio-checked');
+            }, getValueCtrl: () => {
+                return $('.radio-list input[type="hidden" name="gender"]');
+            }, transferValueFunc: (val) => {
+                switch (val) {
+                    case '男':
+                        return 1;
+                    case '女':
+                        return 0;
+                    default:
+                        return null;
+                }
+            }
+        }),
+    mail: new AdapterField({
+        runner: clickBasicService, getValueCtrl: () => {
+            return $('input[type="mail"]');
+        }
     }),
-    summary: new AdapterField(runner = clickBasicService, valueCtrlFunc = () => {
-        return $('textarea[name="advantage"]');
+    birthday: new AdapterField({
+        runner: clickBasicService, getValueCtrl: () => {
+            return $('input[name="birthday"]');
+        }
+    }),
+    summary: new AdapterField({
+        runner: clickBasicService, getValueCtrl: () => {
+            return $('textarea[name="advantage"]');
+        }
     }),
     intension: new AdapterCollection(() => {
         return $('#resume-project [id=^row-]')
     }, {
-            name: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
-                return $('[ka="project-name"]');
+            name: new AdapterField({
+                runner: clickExperienceService, getValueCtrl: () => {
+                    return $('[ka="project-name"]');
+                }
             }),
-            role: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
-                return $('[ka="project-role"]');
+            role: new AdapterField({
+                runner: clickExperienceService, getValueCtrl: () => {
+                    return $('[ka="project-role"]');
+                }
             }),
-            url: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
-                return $('[ka="project-url"]');
+            url: new AdapterField({
+                runner: clickExperienceService, getValueCtrl: () => {
+                    return $('[ka="project-url"]');
+                }
             }),
-            startTime: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
-                return $('[ka="project-start-date"]');
+            startTime: new AdapterField({
+                runner: clickExperienceService, getValueCtrl: () => {
+                    return $('[ka="project-start-date"]');
+                }
             }),
-            finishTime: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
-                return $('[ka="project-end-date"]');
+            finishTime: new AdapterField({
+                runner: clickExperienceService, getValueCtrl: () => {
+                    return $('[ka="project-end-date"]');
+                }
             }),
-            description: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
-                return $('[ka="project-description"]');
+            description: new AdapterField({
+                runner: clickExperienceService, getValueCtrl: () => {
+                    return $('[ka="project-description"]');
+                }
             }),
-            performance: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
-                return ('[ka="project-performance"]');
+            performance: new AdapterField({
+                runner: clickExperienceService, getValueCtrl: () => {
+                    return ('[ka="project-performance"]');
+                }
             })
         }
     ),
     careers: new AdapterCollection(() => {
         return $('#resume-project [id=^row-]');
     }, {
-            company: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
-                return $('[ka="work-company"]');
+            company: new AdapterField({
+                runner: clickExperienceService, getValueCtrl: () => {
+                    return $('[ka="work-company"]');
+                }
             }),
-            position: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
+            position: new AdapterField({
+                runner: clickExperienceService, getValueCtrl: () => {
 
-                return $('[ka="work-position-name"]');
+                    return $('[ka="work-position-name"]');
+                }
             }),
-            department: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
-                return $('[ka="work-position"]');
+            department: new AdapterField({
+                runner: clickExperienceService, getValueCtrl: () => {
+                    return $('[ka="work-position"]');
+                }
             }),
-            industry: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
-                return $('[ka="work-industry"]')
+            industry: new AdapterField({
+                runner: clickExperienceService, getValueCtrl: () => {
+                    return $('[ka="work-industry"]')
+                }
             }),
-            works: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
-                return $('[ka="work-responsibility"]');
+            works: new AdapterField({
+                runner: clickExperienceService, getValueCtrl: () => {
+                    return $('[ka="work-responsibility"]');
+                }
             }),
-            performance: new AdapterField(runner = clickExperienceService, valueCtrlFunc = () => {
-                return $('[ka="work-performance"]');
+            performance: new AdapterField({
+                runner: clickExperienceService, getValueCtrl: () => {
+                    return $('[ka="work-performance"]');
+                }
             })
         }
     )

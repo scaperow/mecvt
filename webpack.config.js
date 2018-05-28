@@ -32,7 +32,9 @@ module.exports = {
 
                 test: /\.(ttf|eot|svg|woff|woff2)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 loader: "file-loader"
-            }
+            },
+            { test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" }
+
         ]
     },
 

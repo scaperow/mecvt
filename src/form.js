@@ -1,4 +1,5 @@
 
+import $ from 'jquery';
 const form = {
     type: "object",
     title: "基本信息",
