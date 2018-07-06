@@ -1,6 +1,6 @@
-
-const ReadyService = function (runner) {
-    this.runner = runner;
+const ReadyService = function (runner, restore) {
+    this.run = runner;
+    this.restore = restore;
 };
 
 

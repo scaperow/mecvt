@@ -1,86 +1,76 @@
-const AdapterField = function (runner, getValueCtrl, transferValue, getTextCtrl = getValueCtrl) {
-    this.runner = runner;
-    this.getValueCtrl = getValueCtrl;
-    this.getTextCtrl = getTextCtrl;
-    this.transferCtrl = transferValue;
+const AdapterField = function (options = {}) {
+    this.view = options.view || $(document);
+    this.getValueCtrl = options.getValueCtrl;
+    this.getTextCtrl = options.getTextCtrl;
+    this.transferValue = options.transferValue;
+
 };
 
-AdapterField.prototype.setValue = function (value) {
-    return new Promise((resolve, reject) => {
-        const setValueFunction = (val) => {
-            this.getValueCtrl()
-                .then(ctrl => {
-                    ctrl.value = val;
-                    resolve(val);
-                })
-                .catch(error => {
-                    reject(error);
-                });
-        };
-
-        if (typeof (this.transferValue) === Function) {
-            this.transferValue(trasnferredValue)
-                .then(val => {
-                    setValueFunction(trasnferredValue);
-                })
-        } else {
-            setValueFunction(value);
+AdapterField.prototype.setValue = async function (value) {
+    const setValueFunction = (val) => {
+        let ctrl = this.getValueCtrl(this.view).value;
+        if (ctrl !== null && ctrl !== undefined) {
+            ctrl.val(val);
         }
-    });
+
+        return true;
+    };
 };
 
 
-AdapterField.prototype.setText = function (value) {
-    return new Promise((resolve, reject) => {
-        const setTextFunction = (val) => {
-            if (this.getTextCtrl instanceof Function) {
-                this.getTextCtrl()
-                    .then(ctrl => {
-                        ctrl.value = val;
-                        resolve(val);
-                    })
-                    .catch(error => {
-                        reject(error);
-                    });
-            } else {
-                resolve();
-            }
-        };
+AdapterField.prototype.setText = async function (value) {
+    if (this.getTextCtrl instanceof Function) {
+        try {
+            let ctrl = await this.getTextCtrl(this.view);
 
+            ctrl.val(value);
+            return true;
 
-        setTextFunction(value);
-    });
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    } else {
+        return Promise.reject('error function');
+    }
 };
 
-AdapterField.prototype.getText = function () {
-    return new Promise((resolve, reject) => {
-        this.getTextCtrl()
-            .then(ctrl => {
-                resolve(ctrl.value);
-            })
-            .cathch(error => {
-                reject(error);
-            });
-    });
+AdapterField.prototype.getText = async function () {
+
+    if (this.getTextCtrl instanceof Function) {
+        try {
+            let ctrl = await this.getTextCtrl(this.view);
+
+            return ctrl.text();
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    } else {
+        return Promise.reject('error function');
+    }
 };
 
-AdapterField.prototype.getValue = function () {
-    return new Promise((resolve, reject) => {
-        this.getValueCtrl()
-            .then(ctrl => {
-                resolve(ctrl.value);
-            })
-            .cathch(error => {
-                reject(error);
-            });
-    });
-};
+AdapterField.prototype.getValue = async function () {
+    if (this.getValueCtrl instanceof Function) {
+        try {
+            let ctrl = await this.getValueCtrl(this.view);
+            return ctrl.val();
 
-
-const AdapterCollection = function (getChildrensFunc, childFields) {
-    this.getChildrens = getChildrensFunc;
-    this.childFields = childFields;
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    } else {
+        return Promise.reject('error function');
+    }
 };
 
 
-export { AdapterField, AdapterCollection };
+const AdapterCollection = function (size) {
+    this.size = size;
+};
+
+
+export {
+    AdapterField,
+    AdapterCollection
+};
