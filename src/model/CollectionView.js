@@ -1,14 +1,16 @@
 const CollectionView = function (size, getItemFunction) {
     this.subViews = [];
-    this.subPromises = [];
+
+    var subPromises = [];
     for (let i = 0; i < size; i++) {
-        this.subPromises.push(getItemFunction(i));
+        subPromises.push(getItemFunction(i));
     }
 
     Promise.all(subPromises)
         .then(results => {
             this.subViews = results;
         }, error => {
+            console.log(error);
             alert(error);
         });
 }

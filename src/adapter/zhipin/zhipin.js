@@ -5,19 +5,21 @@ import {
 import View from '../../model/View';
 import CollectionView from '../../model/CollectionView';
 
-basicEditView = '';
-experienceEditView = '';
+var basicEditView = '';
+var experienceEditView = '';
 
 const loopGetDocument = function (failCount, timeout, executor) {
-    let failCount = failCount;
     return new Promise((resolve, reject) => {
-        window.setInterval(() => {
+
+        const interval = window.setInterval(() => {
             let tag = executor();
             if (tag && tag.length > 0) {
                 resolve(tag);
             } else {
                 if (--failCount <= 0) {
+                    window.clearInterval(interval);
                     reject('页面出现错误');
+
                 }
             }
 
@@ -25,13 +27,13 @@ const loopGetDocument = function (failCount, timeout, executor) {
     });
 };
 
-let setBasicEditView = new Promise((resolve, reject) => {
+let setBasicEditView = new Promise(async (resolve, reject) => {
     let basicEditView = null;
     $('[ka="user-resume-edit-userinfo"]').click();
 
     try {
         basicEditView = await loopGetDocument(3, 2000, () => {
-            return $('from.form-resume');
+            return $('form.form-resume');
         });
 
         if (basicEditView) {
@@ -41,6 +43,8 @@ let setBasicEditView = new Promise((resolve, reject) => {
             reject(error);
         }
     } catch (error) {
+        console.debug('form.form-resume not found');
+
         reject(error);
     }
 });
@@ -49,7 +53,7 @@ let setExperienceEditView = new Promise((resolve, reject) => {
     const selector = $('#resume-project .history-item');
     let size = selector.length;
     let experienceEditView = new CollectionView(size, (index) => {
-        return new Promise((subResolve, subReject) => {
+        return new Promise(async (subResolve, subReject) => {
             const subDetailView = selector[index];
             if (subDetailView && subDetailView.length > 0) {
                 $(subDetailView).find('.fz-resume .fz-edit').click();
@@ -62,9 +66,11 @@ let setExperienceEditView = new Promise((resolve, reject) => {
                     if (subEditView) {
                         subResolve(new View(subEditView));
                     } else {
+                        debugger;
                         return subReject('页面出现错误');
                     }
                 } catch (error) {
+                    console.debug('form.form-resume not found');
                     subReject(error);
                 }
             }
@@ -82,33 +88,34 @@ const adapter = {
         basicEditView = '';
         experienceEditView = '';
 
-        return new Promise((resolve, reject) => {
-            Promise.all([setBasicEditView, setExperienceEditView])
-                .then((views) => {
-                    basicEditView = views[0];
-                    experienceEditView = views[1];
-
-                    resolve();
-                })
-                .catch((error) => {
-                    reject(error);
-                })
-        });
+        Promise.all([setBasicEditView, setExperienceEditView])
+            .then((views) => {
+                basicEditView = views[0];
+                experienceEditView = views[1];
+                console.log('adapter has inited');
+                return Promise.resolve();
+            })
+            .catch((error) => {
+                return Promise.reject(error);
+            })
 
     },
     tel: new AdapterField({
         getValueCtrl: (view) => {
-            return view.find('.fz-resume .fz-tel');
+            return view.find('.fz-resume .fz-tel').parent();
+        },
+        getValue: (ctrl) => {
+            return ctrl.text();
         }
     }),
     name: new AdapterField({
-        service: clickBasicService,
+        view: basicEditView,
         getValueCtrl: (view) => {
             return view.find('input[name="name"]');
         }
     }),
     gender: new AdapterField({
-        service: clickBasicService,
+        view: basicEditView,
         getTextCtrl: (view) => {
             return view.find('.radio-list .radio-checked');
         },
@@ -131,7 +138,7 @@ const adapter = {
     mail: new AdapterField({
         view: basicEditView,
         getValueCtrl: (view) => {
-            return view.find('input[type="mail"]');
+            return view.find('input[name="email"]');
         }
     }),
     birthday: new AdapterField({

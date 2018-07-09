@@ -8,18 +8,13 @@ import {
     AdapterCollection,
     AdapterField
 } from './model/Adapter';
-import adapter from './adapter/zhipin/zhipin';
-import ReadyService from './model/ReadyService';
 
 
-(function () {
+(async function () {
     const getItemValue = async (fieldAdapter) => {
         try {
-            if (fieldAdapter.service instanceof ReadyService) {
-                await fieldAdapter.service.run();
-            }
 
-            let value = await fieldAdapter.getValue();
+            let value = await fieldAdapter.getValue(fieldAdapter.getValueCtrl());
 
             if (fieldAdapter.transferValue instanceof Function) {
                 return fieldAdapter.transferValue(value);
@@ -97,6 +92,7 @@ import ReadyService from './model/ReadyService';
                 }
             }
         } catch (error) {
+            console.error(error);
             alert(error);
         }
     });

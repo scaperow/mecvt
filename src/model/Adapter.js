@@ -4,63 +4,52 @@ const AdapterField = function (options = {}) {
     this.getTextCtrl = options.getTextCtrl;
     this.transferValue = options.transferValue;
 
+
+    if (options.getValue instanceof Function) {
+        this.getValue = options.getValue;
+    }
 };
 
 AdapterField.prototype.setValue = async function (value) {
-    const setValueFunction = (val) => {
-        let ctrl = this.getValueCtrl(this.view).value;
-        if (ctrl !== null && ctrl !== undefined) {
-            ctrl.val(val);
-        }
+    let ctrl = this.getValueCtrl(this.view).value;
+    if (ctrl !== null && ctrl !== undefined) {
+        ctrl.val(val);
+    }
 
-        return true;
-    };
+    return true;
 };
 
 
 AdapterField.prototype.setText = async function (value) {
-    if (this.getTextCtrl instanceof Function) {
-        try {
-            let ctrl = await this.getTextCtrl(this.view);
+    try {
+        let ctrl = await this.getTextCtrl(this.view);
 
-            ctrl.val(value);
-            return true;
+        ctrl.val(value);
+        return true;
 
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    } else {
-        return Promise.reject('error function');
+    } catch (error) {
+        return Promise.reject(error);
     }
 };
 
 AdapterField.prototype.getText = async function () {
+    try {
+        let ctrl = await this.getTextCtrl(this.view);
 
-    if (this.getTextCtrl instanceof Function) {
-        try {
-            let ctrl = await this.getTextCtrl(this.view);
+        return ctrl.text();
 
-            return ctrl.text();
-
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    } else {
-        return Promise.reject('error function');
+    } catch (error) {
+        return Promise.reject(error);
     }
 };
 
 AdapterField.prototype.getValue = async function () {
-    if (this.getValueCtrl instanceof Function) {
-        try {
-            let ctrl = await this.getValueCtrl(this.view);
-            return ctrl.val();
+    try {
+        let ctrl = await this.getValueCtrl(this.view);
+        return ctrl.val();
 
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    } else {
-        return Promise.reject('error function');
+    } catch (error) {
+        return Promise.reject(error);
     }
 };
 
