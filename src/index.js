@@ -8,13 +8,14 @@ import {
     AdapterCollection,
     AdapterField
 } from './model/Adapter';
+import adapter from './adapter/zhipin/zhipin';
 
 
 (async function () {
     const getItemValue = async (fieldAdapter) => {
         try {
 
-            let value = await fieldAdapter.getValue(fieldAdapter.getValueCtrl());
+            let value = await fieldAdapter.getValue(fieldAdapter.getValueCtrl(fieldAdapter.view));
 
             if (fieldAdapter.transferValue instanceof Function) {
                 return fieldAdapter.transferValue(value);
@@ -83,7 +84,21 @@ import {
                         val = await getItemValue(adapterItem);
                         console.log(`${key}:${val}`);
                     } else if (adapterItem instanceof AdapterCollection) {
+                        const size = adapterItem.size;
+                        let itemObject = {};
+                        val = [];
+                        for (let i = 0; i < size; i++) {
 
+                            for (let key in adapterItem.fields) {
+                                debugger;
+                                itemObject[key] = await getItemValue(adapterItem.fields[key])
+                            }
+
+                            val.push(itemObject);
+                            itemObject = {};
+                        }
+                        console.log(key + ">");
+                        console.log(JSON.stringify(val));
                     } else {
 
                     }

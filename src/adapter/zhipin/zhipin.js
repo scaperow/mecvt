@@ -37,8 +37,8 @@ let setBasicEditView = new Promise(async (resolve, reject) => {
         });
 
         if (basicEditView) {
+            $('[ka="user-resume-user-info-cancel"]').click();
             resolve(new View(basicEditView));
-            $('[ka="user-resume-edit-userinfo"]').click();
         } else {
             reject(error);
         }
@@ -102,7 +102,7 @@ const adapter = {
     },
     tel: new AdapterField({
         getValueCtrl: (view) => {
-            return view.find('.fz-resume .fz-tel').parent();
+            return view.find('.fz-resume.fz-tel').parent();
         },
         getValue: (ctrl) => {
             return ctrl.text();
@@ -148,9 +148,11 @@ const adapter = {
         }
     }),
     summary: new AdapterField({
-        view: basicEditView,
         getValueCtrl: (view) => {
-            return view.find('textarea[name="advantage"]');
+            return view.find('#resume-summary p');
+        },
+        getValue: (ctrl) => {
+            return ctrl.html().replace(/<br>/g, '\n');
         }
     }),
     experience: new AdapterCollection(3, {

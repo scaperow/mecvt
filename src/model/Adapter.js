@@ -54,8 +54,9 @@ AdapterField.prototype.getValue = async function () {
 };
 
 
-const AdapterCollection = function (size) {
+const AdapterCollection = function (size, fields) {
     this.size = size;
+    this.fields = fields;
 };
 
 
