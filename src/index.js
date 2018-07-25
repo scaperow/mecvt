@@ -4,29 +4,9 @@ import './style/site.less';
 import ContainerTemplate from './templates/container.html';
 import form from './form.js';
 import zhipin from './adapter/zhipin/zhipin';
-import {
-    AdapterCollection,
-    AdapterField
-} from './model/Adapter';
-import adapter from './adapter/zhipin/zhipin';
 
 
 (async function () {
-    const getItemValue = async (fieldAdapter) => {
-        try {
-
-            let value = await fieldAdapter.getValue(fieldAdapter.getValueCtrl(fieldAdapter.view));
-
-            if (fieldAdapter.transferValue instanceof Function) {
-                return fieldAdapter.transferValue(value);
-            } else {
-                return value;
-            }
-        } catch (error) {
-            return Promise.reject(error);
-        }
-
-    };
 
 
     $("head").append("<link>");
@@ -69,41 +49,60 @@ import adapter from './adapter/zhipin/zhipin';
         isToggled = !isToggled;
     });
 
+    const getArrayValue = (field) => {
+        let array = [];
+        let objects = null;
+        let itemObject = null;
+
+        for (var i = 0; i < field.$size(); i++) {
+            itemObject = {};
+
+            for (let key in field) {
+                if (!key.startsWith('$')) {
+                    
+                    console.log(`${key}:${field[key]}`);
+                    itemObject[key] = getValue(field[key], i);
+                }
+            }
+
+            array.push(itemObject);
+        }
+
+        return array;
+    };
+
+    const getValue = (field, index) => {
+        console.log(`${field}:${index}`);
+        let control = field.$control(index);
+        if (control) {
+            if (index > -1) {
+                return field.$get(index, control);
+            } else {
+                return field.$get(control);
+            }
+
+        }
+
+        return null;
+    };
+
     $('#cvt_sync_right_btn').click(async () => {
         try {
             await zhipin.constructor();
             for (var key in form.properties) {
-                let property = form.properties[key];
-                let setter = null;
-                let val = null;
-                let fieldEditor = editor.getEditor('root.' + key);
+                let value = null;
 
-                let adapterItem = zhipin[key];
-                if (adapterItem) {
-                    if (adapterItem instanceof AdapterField) {
-                        val = await getItemValue(adapterItem);
-                        console.log(`${key}:${val}`);
-                    } else if (adapterItem instanceof AdapterCollection) {
-                        const size = adapterItem.size;
-                        let itemObject = {};
-                        val = [];
-                        for (let i = 0; i < size; i++) {
-
-                            for (let key in adapterItem.fields) {
-                                debugger;
-                                itemObject[key] = await getItemValue(adapterItem.fields[key])
-                            }
-
-                            val.push(itemObject);
-                            itemObject = {};
-                        }
-                        console.log(key + ">");
-                        console.log(JSON.stringify(val));
+                let ctrl = editor.getEditor('root.' + key);
+                let field = zhipin[key];
+                if (field) {
+                    if (field.$isArray) {
+                        value = getArrayValue(field);
                     } else {
-
+                        value = getValue(field);
                     }
 
-                    fieldEditor.setValue(val);
+                    console.log(value);
+                    ctrl.setValue(value);
                 }
             }
         } catch (error) {

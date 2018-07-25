@@ -1,18 +1,27 @@
 const CollectionView = function (size, getItemFunction) {
+    this.size = size;
+    this.getItems = getItemFunction;
     this.subViews = [];
 
-    var subPromises = [];
-    for (let i = 0; i < size; i++) {
-        subPromises.push(getItemFunction(i));
-    }
+    this.constructor = () => {
+        var subPromises = [];
+        for (let i = 0; i < this.size; i++) {
+            subPromises.push(this.getItems(i));
+        }
 
-    Promise.all(subPromises)
-        .then(results => {
-            this.subViews = results;
-        }, error => {
-            console.log(error);
-            alert(error);
-        });
+        Promise.all(subPromises)
+            .then(results => {
+                this.subViews = results;
+                return Promise.resolve(this.subViews);
+            }, error => {
+                console.log(error);
+                return Promise.reject(error);
+            });
+
+    };
 }
+
+
+
 
 export default CollectionView;

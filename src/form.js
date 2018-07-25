@@ -81,10 +81,7 @@ const form = {
                         title: "工作内容",
                         type: "string"
                     },
-                    performance: {
-                        title: "业绩",
-                        type: "string"
-                    },
+                   
                     salary: {
                         title: "薪资",
                         type: "string"
@@ -159,10 +156,14 @@ const form = {
                         title: "描述",
                         type: "string"
                     },
-                    achievement: {
+                    url: {
+                        title: "链接",
+                        type: "string"
+                    },
+                    performance: {
                         title: "业绩",
                         type: "string"
-                    }
+                    },
                 }
 
             }

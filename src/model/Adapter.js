@@ -1,57 +1,48 @@
 const AdapterField = function (options = {}) {
     this.view = options.view || $(document);
-    this.getValueCtrl = options.getValueCtrl;
-    this.getTextCtrl = options.getTextCtrl;
-    this.transferValue = options.transferValue;
+    let option = options;
 
+    this.checkInstance = () => {
+        if (option.getTextCtrl && !this.textCtrl) {
+            this.textCtrl = option.getTextCtrl(this.view);
+        }
 
-    if (options.getValue instanceof Function) {
-        this.getValue = options.getValue;
+        if (option.getValueCtrl && !this.valueCtrl) {
+            this.valueCtrl = options.getValueCtrl(this.view);
+        }
+
+        if (option.getValue) {
+            this.getValue = option.getValue;
+        }
+
+        if (option.getText) {
+            this.getText = option.getText;
+        }
     }
+
 };
 
-AdapterField.prototype.setValue = async function (value) {
-    let ctrl = this.getValueCtrl(this.view).value;
-    if (ctrl !== null && ctrl !== undefined) {
-        ctrl.val(val);
-    }
-
-    return true;
+AdapterField.prototype.setValue = function (value) {
+    this.checkInstance();
+    this.valueCtrl.val(value);
 };
 
 
 AdapterField.prototype.setText = async function (value) {
-    try {
-        let ctrl = await this.getTextCtrl(this.view);
-
-        ctrl.val(value);
-        return true;
-
-    } catch (error) {
-        return Promise.reject(error);
-    }
+    this.checkInstance();
+    this.textCtrl.val(value);
 };
 
 AdapterField.prototype.getText = async function () {
-    try {
-        let ctrl = await this.getTextCtrl(this.view);
-
-        return ctrl.text();
-
-    } catch (error) {
-        return Promise.reject(error);
-    }
+    this.checkInstance();
+    return this.textCtrl.text();
 };
 
-AdapterField.prototype.getValue = async function () {
-    try {
-        let ctrl = await this.getValueCtrl(this.view);
-        return ctrl.val();
-
-    } catch (error) {
-        return Promise.reject(error);
-    }
+AdapterField.prototype.getValue = function () {
+    this.checkInstance();
+    return this.valueCtrl.val();
 };
+
 
 
 const AdapterCollection = function (size, fields) {

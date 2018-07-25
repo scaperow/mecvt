@@ -1,12 +1,5 @@
-import {
-    AdapterCollection,
-    AdapterField
-} from '../../model/Adapter';
-import View from '../../model/View';
-import CollectionView from '../../model/CollectionView';
-
-var basicEditView = '';
-var experienceEditView = '';
+var basicEditView = null;
+var experienceEditViews = null;
 
 const loopGetDocument = function (failCount, timeout, executor) {
     return new Promise((resolve, reject) => {
@@ -27,103 +20,110 @@ const loopGetDocument = function (failCount, timeout, executor) {
     });
 };
 
-let setBasicEditView = new Promise(async (resolve, reject) => {
-    let basicEditView = null;
-    $('[ka="user-resume-edit-userinfo"]').click();
+let setBasicEditView = () => {
+    return new Promise(async (resolve, reject) => {
+        let basicEditView = null;
+        $('[ka="user-resume-edit-userinfo"]').click();
 
-    try {
-        basicEditView = await loopGetDocument(3, 2000, () => {
-            return $('form.form-resume');
-        });
+        try {
+            basicEditView = await loopGetDocument(3, 2000, () => {
+                return $('form.form-resume');
+            });
 
-        if (basicEditView) {
-            $('[ka="user-resume-user-info-cancel"]').click();
-            resolve(new View(basicEditView));
-        } else {
+            if (basicEditView) {
+                $('[ka="user-resume-user-info-cancel"]').click();
+                resolve(basicEditView);
+            } else {
+                reject(error);
+            }
+        } catch (error) {
+            console.debug('form.form-resume not found');
             reject(error);
         }
-    } catch (error) {
-        console.debug('form.form-resume not found');
+    })
+};
 
-        reject(error);
-    }
-});
+let setExperienceEditView = () => {
+    return new Promise(async (resolve, reject) => {
+        const result = [];
+        const selector = $('#resume-project .history-item');
 
-let setExperienceEditView = new Promise((resolve, reject) => {
-    const selector = $('#resume-project .history-item');
-    let size = selector.length;
-    let experienceEditView = new CollectionView(size, (index) => {
-        return new Promise(async (subResolve, subReject) => {
-            const subDetailView = selector[index];
+        for (let i = 0; i < selector.length; i++) {
+            const subDetailView = $(selector[i]);
             if (subDetailView && subDetailView.length > 0) {
-                $(subDetailView).find('.fz-resume .fz-edit').click();
+
+                $(subDetailView).find('.fz-resume.fz-edit').click();
 
                 try {
-                    const subEditView = await loopGetDocument(3, 2000, () => {
-                        return $('form.form-resume');
+                    const view = await loopGetDocument(3, 2000, () => {
+                        return $('#resume-project form.form-resume');
                     });
 
-                    if (subEditView) {
-                        subResolve(new View(subEditView));
+                    if (view) {
+                        result.push($(view));
                     } else {
-                        debugger;
-                        return subReject('页面出现错误');
+                        reject('视图出现了错误');
                     }
                 } catch (error) {
                     console.debug('form.form-resume not found');
-                    subReject(error);
+                    reject(error);
                 }
             }
-        });
+        }
 
-    });
-
-    resolve(experienceEditView);
-});
+        resolve(result);
+    })
+};
 
 
 
 const adapter = {
+    isInited: false,
     constructor: () => {
-        basicEditView = '';
-        experienceEditView = '';
+        return new Promise((resolve, reject) => {
+            basicEditView = '';
+            experienceEditViews = '';
 
-        Promise.all([setBasicEditView, setExperienceEditView])
-            .then((views) => {
-                basicEditView = views[0];
-                experienceEditView = views[1];
-                console.log('adapter has inited');
-                return Promise.resolve();
-            })
-            .catch((error) => {
-                return Promise.reject(error);
-            })
-
+            Promise.all([setBasicEditView(), setExperienceEditView()])
+                .then((views) => {
+                    basicEditView = views[0];
+                    experienceEditViews = views[1];
+                    console.log('adapter has inited');
+                    resolve();
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
     },
-    tel: new AdapterField({
-        getValueCtrl: (view) => {
-            return view.find('.fz-resume.fz-tel').parent();
+    tel: {
+        $control: () => {
+            return $(document).find('.fz-resume.fz-tel').parent();
         },
-        getValue: (ctrl) => {
-            return ctrl.text();
+        $get: (control) => {
+            return control.text();
+        },
+        $set: (control, value) => {
+            control.text(value);
         }
-    }),
-    name: new AdapterField({
-        view: basicEditView,
-        getValueCtrl: (view) => {
-            return view.find('input[name="name"]');
+    },
+    name: {
+        $control: () => {
+            return basicEditView.find('input[name="name"]');
+        },
+        $set: (control, value) => {
+            return control.val(value);
+        },
+        $get: (control) => {
+            return control.val();
         }
-    }),
-    gender: new AdapterField({
-        view: basicEditView,
-        getTextCtrl: (view) => {
-            return view.find('.radio-list .radio-checked');
+    },
+    gender: {
+        $control: () => {
+            return basicEditView.find('.radio-list .radio-checked');
         },
-        getValueCtrl: (view) => {
-            return view.find('.radio-list input[type="hidden"][name="gender"]');
-        },
-        transferValue: (val) => {
-            switch (parseInt(val)) {
+        $get: (control) => {
+            switch (parseInt(control.val())) {
                 case 1:
                     return "男";
 
@@ -133,73 +133,142 @@ const adapter = {
                 default:
                     return null;
             }
-        }
-    }),
-    mail: new AdapterField({
-        view: basicEditView,
-        getValueCtrl: (view) => {
-            return view.find('input[name="email"]');
-        }
-    }),
-    birthday: new AdapterField({
-        view: basicEditView,
-        getValueCtrl: (view) => {
-            return view.find('input[name="birthday"]');
-        }
-    }),
-    summary: new AdapterField({
-        getValueCtrl: (view) => {
-            return view.find('#resume-summary p');
         },
-        getValue: (ctrl) => {
-            return ctrl.html().replace(/<br>/g, '\n');
+        $set: (control, value) => {
+            switch (value) {
+                case "男":
+                    control.val(1);
+                    break;
+
+                case "女":
+                    control.val(0);
+
+                default:
+                    control.val(null);
+            }
         }
-    }),
-    experience: new AdapterCollection(3, {
-        name: new AdapterField({
-            view: experienceEditView,
-            getValueCtrl: (view) => {
-                return view.find('[ka="project-name"]');
+    },
+    mail: {
+        $control: () => {
+            return basicEditView.find('input[name="email"]');
+        },
+        $get: (control) => {
+            return control.val();
+        },
+        $set: (control, value) => {
+            return control.val(value);
+        }
+    },
+    birthday: {
+        $control: () => {
+            return basicEditView.find('input[name="birthday"]');
+        },
+        $get: (control) => {
+            return control.val();
+        },
+        $set: (control, value) => {
+            return control.val(value);
+        }
+    },
+    summary: {
+        $control: () => {
+            return $(document).find('#resume-summary p');
+        },
+        $get: (control) => {
+            return control.html().replace(/<br>/g, '\n');
+        },
+        $set: (control, value) => {
+            control.val(value);
+        }
+    },
+    experience: {
+        $isArray: true,
+        $size: () => {
+            return experienceEditViews.length
+        },
+        name: {
+            $control: (index) => {
+                return experienceEditViews[index].find('[ka="project-name"]');
+            },
+            $set: (index, control, value) => {
+                control.val(value);
+            },
+            $get: (index, control) => {
+                return control.val();
             }
-        }),
-        role: new AdapterField({
-            view: experienceEditView,
-            getValueCtrl: (view) => {
-                return view.find('[ka="project-role"]');
+        },
+        role: {
+            $control: (index) => {
+                return experienceEditViews[index].find('[ka="project-role"]');
+            },
+            $set: (index, control, value) => {
+                control.val(value);
+            },
+            $get: (index, control) => {
+                return control.val();
             }
-        }),
-        url: new AdapterField({
-            view: experienceEditView,
-            getValueCtrl: (view) => {
-                return view.find('[ka="project-url"]');
+        },
+        url: {
+            $control: (index) => {
+                return experienceEditViews[index].find('[ka="project-url"]');
+            },
+            $set: (index, control, value) => {
+                control.val(value);
+            },
+            $get: (index, control) => {
+                return control.val();
             }
-        }),
-        startTime: new AdapterField({
-            view: experienceEditView,
-            getValueCtrl: (view) => {
-                return view.find('[ka="project-start-date"]');
+        },
+        startTime: {
+            $control: (index) => {
+                return experienceEditViews[index].find('[ka="project-start-date"]');
+            },
+            $set: (index, control, value) => {
+                control.val(value);
+            },
+            $get: (index, control) => {
+                return control.val();
             }
-        }),
-        finishTime: new AdapterField({
-            view: experienceEditView,
-            getValueCtrl: (view) => {
-                return view.find('[ka="project-end-date"]');
+        },
+        finishTime: {
+            $control: (index) => {
+                return experienceEditViews[index].find('[ka="project-end-date"]');
+            },
+            $set: (index, control, value) => {
+                control.val(value);
+            },
+            $get: (index, control) => {
+                return control.val();
             }
-        }),
-        description: new AdapterField({
-            view: experienceEditView,
-            getValueCtrl: (view) => {
-                return view.find('[ka="project-description"]');
+        },
+        description: {
+            $control: (index) => {
+                return experienceEditViews[index].find('[ka="project-description"]');
+            },
+            $set: (index, control, value) => {
+                control.val(value);
+            },
+            $get: (index, control) => {
+                return control.val();
             }
-        }),
-        performance: new AdapterField({
-            view: experienceEditView,
-            getValueCtrl: (view) => {
-                return view.find('[ka="project-performance"]');
+        },
+        performance: {
+            $control: (index) => {
+                return experienceEditViews[index].find('[ka="project-performance"]');
+            },
+            $set: (index, control, value) => {
+                control.val(value);
+            },
+            $get: (index, control) => {
+                return control.val();
             }
-        })
-    }),
-    careers: new AdapterCollection(3, {
+        }
+    }
+    /*
+    ,
+    careers: {
+        $isArray: true,
+        $size: 3,
         company: new AdapterField({
             getValueCtrl: (view) => {
                 return view.find('[ka="work-company"]');
@@ -231,7 +300,8 @@ const adapter = {
                 return view.find('[ka="work-performance"]');
             }
         })
-    })
+    }*/
+
 };
 
 export default adapter;
