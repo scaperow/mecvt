@@ -9,31 +9,45 @@ module.exports = {
         index: './src/index.js'
     },
     module: {
-        rules: [
-            {
+        rules: [{
                 test: /\.less$/,
                 exclude: /node_modules/,
-                use: [{ loader: "style-loader" }, { loader: "css-loader" }, { loader: "less-loader" }
-                ]
+                use: [{
+                    loader: "style-loader"
+                }, {
+                    loader: "css-loader"
+                }, {
+                    loader: "less-loader"
+                }]
             },
             {
                 test: /\.css$/,
-                use: [{ loader: "style-loader" },
-                {
-                    loader: "css-loader"
-                }
+                use: [{
+                        loader: "style-loader"
+                    },
+                    {
+                        loader: "css-loader"
+                    }
                 ]
             },
             {
                 test: /\.html$/,
-                exclude: /node_modules/, loader: 'raw-loader'
+                exclude: /node_modules/,
+                loader: 'raw-loader'
+            }, 　 {　　　　　　
+                test: /\.(png|jpg|gif)$/,
+                　　　　　　loader: 'url-loader?limit=8192'　　　　
             },
             {
 
                 test: /\.(ttf|eot|svg|woff|woff2)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 loader: "file-loader"
             },
-            { test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" }
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                loader: "babel-loader"
+            }
 
         ]
     },

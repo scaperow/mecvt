@@ -52,7 +52,7 @@ const form = {
         },
 
 
-        career: {
+        careers: {
             type: "array",
             title: "工作经历",
             items: {
@@ -69,6 +69,11 @@ const form = {
                         title: "职位",
                         type: "string"
                     },
+                    performance: {
+                        title: "业绩",
+                        type: "string",
+                        format:"textarea"
+                    },
                     department: {
                         title: "部门",
                         type: "string"
@@ -79,9 +84,11 @@ const form = {
                     },
                     works: {
                         title: "工作内容",
-                        type: "string"
+                        type: "string",
+
+                        format: 'textarea'
                     },
-                   
+
                     salary: {
                         title: "薪资",
                         type: "string"
@@ -154,7 +161,8 @@ const form = {
                     },
                     description: {
                         title: "描述",
-                        type: "string"
+                        type: "string",
+                        format: 'textarea'
                     },
                     url: {
                         title: "链接",
@@ -162,7 +170,8 @@ const form = {
                     },
                     performance: {
                         title: "业绩",
-                        type: "string"
+                        type: "string",
+                        format: 'textarea'
                     },
                 }
 

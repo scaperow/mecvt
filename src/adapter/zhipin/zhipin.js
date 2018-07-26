@@ -1,5 +1,6 @@
 var basicEditView = null;
 var experienceEditViews = null;
+var careersEditViews = null;
 
 const loopGetDocument = function (failCount, timeout, executor) {
     return new Promise((resolve, reject) => {
@@ -76,18 +77,51 @@ let setExperienceEditView = () => {
 };
 
 
+let setCareersEditView = () => {
+    return new Promise(async (resolve, reject) => {
+        const result = [];
+        const selector = $('#resume-history .history-item');
+
+        for (let i = 0; i < selector.length; i++) {
+            const subDetailView = $(selector[i]);
+            if (subDetailView && subDetailView.length > 0) {
+
+                $(subDetailView).find('.fz-resume.fz-edit').click();
+
+                try {
+                    const view = await loopGetDocument(3, 2000, () => {
+                        return $('#resume-history form.form-resume');
+                    });
+
+                    if (view) {
+                        result.push($(view));
+                    } else {
+                        reject('视图出现了错误');
+                    }
+                } catch (error) {
+                    console.debug('form.form-resume not found');
+                    reject(error);
+                }
+            }
+        }
+
+        resolve(result);
+    })
+};
+
+
 
 const adapter = {
-    isInited: false,
     constructor: () => {
         return new Promise((resolve, reject) => {
             basicEditView = '';
             experienceEditViews = '';
 
-            Promise.all([setBasicEditView(), setExperienceEditView()])
+            Promise.all([setBasicEditView(), setExperienceEditView(), setCareersEditView()])
                 .then((views) => {
                     basicEditView = views[0];
                     experienceEditViews = views[1];
+                    careersEditViews = views[2];
                     console.log('adapter has inited');
                     resolve();
                 })
@@ -96,6 +130,7 @@ const adapter = {
                 });
         });
     },
+    
     tel: {
         $control: () => {
             return $(document).find('.fz-resume.fz-tel').parent();
@@ -263,44 +298,43 @@ const adapter = {
                 return control.val();
             }
         }
-    }
-    /*
-    ,
+    },
     careers: {
         $isArray: true,
-        $size: 3,
-        company: new AdapterField({
-            getValueCtrl: (view) => {
-                return view.find('[ka="work-company"]');
+        $size: () => {
+            return careersEditViews.length;
+        },
+        company: {
+            $control: (index) => {
+                return careersEditViews[index].find('[ka="work-company"]');
             }
-        }),
-        position: new AdapterField({
-            getValueCtrl: (view) => {
-
-                return view.find('[ka="work-position-name"]');
+        },
+        position: {
+            $control: (index) => {
+                return careersEditViews[index].find('[ka="work-position-name"]');
             }
-        }),
-        department: new AdapterField({
-            getValueCtrl: (view) => {
-                return view.find('[ka="work-position"]');
+        },
+        department: {
+            $control: (index) => {
+                return careersEditViews[index].find('[ka="work-position"]');
             }
-        }),
-        industry: new AdapterField({
-            getValueCtrl: (view) => {
-                return view.find('[ka="work-industry"]')
+        },
+        industry: {
+            $control: (index) => {
+                return careersEditViews[index].find('[ka="work-industry"]');
             }
-        }),
-        works: new AdapterField({
-            getValueCtrl: (view) => {
-                return view.find('[ka="work-responsibility"]');
+        },
+        works: {
+            $control: (index) => {
+                return careersEditViews[index].find('[ka="work-responsibility"]');
             }
-        }),
-        performance: new AdapterField({
-            getValueCtrl: (view) => {
-                return view.find('[ka="work-performance"]');
+        },
+        performance: {
+            $control: (index) => {
+                return careersEditViews[index].find('[ka="work-performance"]');
             }
-        })
-    }*/
+        }
+    }
 
 };
 

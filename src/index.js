@@ -1,13 +1,15 @@
 import $ from 'jquery';
 import JsonEditor from 'json-editor';
 import './style/site.less';
+import './style/bootstrap-editor.css';
 import ContainerTemplate from './templates/container.html';
 import form from './form.js';
 import zhipin from './adapter/zhipin/zhipin';
+import './layer/layer.js';
+import './layer/theme/default/layer.css';
 
 
 (async function () {
-
 
     $("head").append("<link>");
     const css = $("head").children(":last");
@@ -59,7 +61,7 @@ import zhipin from './adapter/zhipin/zhipin';
 
             for (let key in field) {
                 if (!key.startsWith('$')) {
-                    
+
                     console.log(`${key}:${field[key]}`);
                     itemObject[key] = getValue(field[key], i);
                 }
@@ -75,10 +77,14 @@ import zhipin from './adapter/zhipin/zhipin';
         console.log(`${field}:${index}`);
         let control = field.$control(index);
         if (control) {
-            if (index > -1) {
-                return field.$get(index, control);
+            if (!field.hasOwnProperty('$get')) {
+                return control.val();
             } else {
-                return field.$get(control);
+                if (index > -1) {
+                    return field.$get(index, control);
+                } else {
+                    return field.$get(control);
+                }
             }
 
         }
@@ -87,8 +93,29 @@ import zhipin from './adapter/zhipin/zhipin';
     };
 
     $('#cvt_sync_right_btn').click(async () => {
+        var layerIndex = null;
+
         try {
+
+            layerIndex = layer.msg('正在为导出简历做准备', {
+                icon: 16,
+                scrollbar: false,
+                shade: [1, '#fff'],
+                time: 0 //不自动关闭
+            });
+
             await zhipin.constructor();
+
+            layer.close(layerIndex);
+
+
+            layerIndex = layer.msg('进行中...', {
+                icon: 16,
+                shade: [1, '#fff'],
+                scrollbar: false,
+                time: 0 //不自动关闭
+            });
+
             for (var key in form.properties) {
                 let value = null;
 
@@ -101,13 +128,18 @@ import zhipin from './adapter/zhipin/zhipin';
                         value = getValue(field);
                     }
 
-                    console.log(value);
+                    console.debug(value);
                     ctrl.setValue(value);
                 }
             }
+
+            layer.close(layerIndex);
+
+            layer.msg('导出成功');
         } catch (error) {
             console.error(error);
-            alert(error);
+            layer.msg(error);
+            layer.close(layerIndex);
         }
     });
 
