@@ -7,17 +7,10 @@ import form from './form.js';
 import zhipin from './adapter/zhipin/zhipin';
 import './layer/layer.js';
 import './layer/theme/default/layer.css';
+import adapter from './adapter/zhipin/zhipin';
 
 
 (async function () {
-
-    $("head").append("<link>");
-    const css = $("head").children(":last");
-    css.attr({
-        rel: "stylesheet",
-        type: "text/css",
-        href: "https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"
-    });
 
     let isToggled = false;
 
@@ -92,12 +85,57 @@ import './layer/theme/default/layer.css';
         return null;
     };
 
+    const setValue = async (key, value, index) => {
+        if (zhipin.hasOwnProperty(key)) {
+            var adapterField = zhipin[key];
+
+            if (adapterField.hasOwnProperty('$set')) {
+                if (index > -1) {
+                    adapterField.$set(index, adapterField.$control(), value);
+                } else {
+                    adapterField.$set(adapterField.$control(), value);
+                }
+            } else {
+                adapterField.$control().val(value);
+            }
+
+            if (adapterField.hasOwnProperty('$submit')) {
+                await adapterField.$submit();
+            }
+        }
+    };
+
+    const setArrayValue =  (key, array) => {
+        var arrayItem, adapterField = null;
+        var adapterItemField = null;
+
+        if (zhipin.hasOwnProperty(key)) {
+            adapterField = zhipin[key];
+            adapterField.$clear();
+
+            for (var i = 0; i < array.length; i++) {
+                arrayItem = array[i];
+                adapterField.$create(i, arrayItem);
+
+                for (var arrayItemKey in arrayItem) {
+                    adapterItemField = adapterField[arrayItemKey];
+
+                    setValue(arrayItemKey, arrayItem[arrayItemKey], i);
+                }
+            }
+
+            if (adapterField.hasOwnProperty('$submit')) {
+                adapterField.$submit();
+            }
+        }
+    };
+
     $('#cvt_sync_right_btn').click(async () => {
         var layerIndex = null;
 
         try {
 
-            layerIndex = layer.msg('正在为导出简历做准备', {
+            layerIndex = layer.msg('正在为导入简历做准备', {
                 icon: 16,
                 scrollbar: false,
                 shade: [1, '#fff'],
@@ -135,7 +173,61 @@ import './layer/theme/default/layer.css';
 
             layer.close(layerIndex);
 
-            layer.msg('导出成功');
+            layer.msg('导入成功');
+        } catch (error) {
+            console.error(error);
+            layer.closeAll();
+
+            layer.msg(error);
+        }
+    });
+
+
+    $('#cvt_sync_left_btn').click(async () => {
+        var layerIndex = null;
+
+        try {
+
+            layerIndex = layer.msg('正在为导出简历做准备', {
+                icon: 16,
+                scrollbar: false,
+                shade: [1, '#fff'],
+                time: 0 //不自动关闭
+            });
+
+            await zhipin.constructor();
+
+            layer.close(layerIndex);
+
+            layerIndex = layer.msg('进行中...', {
+                icon: 16,
+                shade: [1, '#fff'],
+                scrollbar: false,
+                time: 0 //不自动关闭
+            });
+
+
+            // 编辑器的值
+            let editorObject = editor.getValue();
+
+            // 遍历编辑器的值
+            for (var editorField in editorObject) {
+                let editorFieldValue = editorObject[editorField];
+                console.log(editorField + ":" + editorFieldValue);
+                if (editorFieldValue instanceof Array) {
+                    await setArrayValue(editorField, editorFieldValue);
+                } else {
+                    setValue(editorField, editorFieldValue);
+                }
+            }
+
+            if (zhipin.hasOwnProperty('$submit')) {
+                await zhipin.$submit();
+            }
+
+            layer.close(layerIndex);
+
+            layer.msg('导出成功,如果有错误,请手工修改');
         } catch (error) {
             console.error(error);
             layer.msg(error);

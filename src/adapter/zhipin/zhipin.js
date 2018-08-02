@@ -2,7 +2,7 @@ var basicEditView = null;
 var experienceEditViews = null;
 var careersEditViews = null;
 
-const loopGetDocument = function (failCount, timeout, executor) {
+const $dom = function (failCount, timeout, executor) {
     return new Promise((resolve, reject) => {
 
         const interval = window.setInterval(() => {
@@ -27,7 +27,7 @@ let setBasicEditView = () => {
         $('[ka="user-resume-edit-userinfo"]').click();
 
         try {
-            basicEditView = await loopGetDocument(3, 2000, () => {
+            basicEditView = await $dom(3, 2000, () => {
                 return $('form.form-resume');
             });
 
@@ -56,7 +56,7 @@ let setExperienceEditView = () => {
                 $(subDetailView).find('.fz-resume.fz-edit').click();
 
                 try {
-                    const view = await loopGetDocument(3, 2000, () => {
+                    const view = await $dom(3, 2000, () => {
                         return $('#resume-project form.form-resume');
                     });
 
@@ -89,7 +89,7 @@ let setCareersEditView = () => {
                 $(subDetailView).find('.fz-resume.fz-edit').click();
 
                 try {
-                    const view = await loopGetDocument(3, 2000, () => {
+                    const view = await $dom(3, 2000, () => {
                         return $('#resume-history form.form-resume');
                     });
 
@@ -109,7 +109,13 @@ let setCareersEditView = () => {
     })
 };
 
-
+const sleep = async (timeout) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve();
+        }, timeout);
+    });
+}
 
 const adapter = {
     constructor: () => {
@@ -130,7 +136,11 @@ const adapter = {
                 });
         });
     },
-    
+    $submit: () => {
+        basicEditView.find('button[type="submit"]').click();
+    },
+    $name: 'BOSS直聘',
+    $key: 'zhipin',
     tel: {
         $control: () => {
             return $(document).find('.fz-resume.fz-tel').parent();
@@ -147,7 +157,7 @@ const adapter = {
             return basicEditView.find('input[name="name"]');
         },
         $set: (control, value) => {
-            return control.val(value);
+            control.val(value);
         },
         $get: (control) => {
             return control.val();
@@ -219,8 +229,15 @@ const adapter = {
     experience: {
         $isArray: true,
         $size: () => {
-            return experienceEditViews.length
+            return experienceEditViews.length;
         },
+        $clear: async () => {
+            for (item in experienceEditViews) {
+                item.find('.fz-resume.fz-delete').click();
+                await sleep(500);
+            }
+        },
+
         name: {
             $control: (index) => {
                 return experienceEditViews[index].find('[ka="project-name"]');
@@ -301,8 +318,33 @@ const adapter = {
     },
     careers: {
         $isArray: true,
+        $clear: () => {
+            return Promise.resolve();
+        },
         $size: () => {
             return careersEditViews.length;
+        },
+        $create: async (index, form) => {
+            return new Promise(async (resolve, reject) => {
+                $('#resume-history .fz-resume.fz-add').click();
+
+                try {
+                    let form = await $dom(3, 1000, () => {
+                        return $('#resume-history form.form-resume');
+                    });
+
+                    careersEditViews.push(form);
+
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        },
+        $remove: (index) => {
+
+        },
+        $submit: () => {
+
         },
         company: {
             $control: (index) => {

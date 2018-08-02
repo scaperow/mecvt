@@ -72,7 +72,7 @@ const form = {
                     performance: {
                         title: "业绩",
                         type: "string",
-                        format:"textarea"
+                        format: "textarea"
                     },
                     department: {
                         title: "部门",
