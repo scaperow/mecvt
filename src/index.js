@@ -221,6 +221,8 @@ import adapter from './adapter/zhipin/zhipin';
                 }
             }
 
+            [[200,300],[210,310]]
+
             if (zhipin.hasOwnProperty('$submit')) {
                 await zhipin.$submit();
             }
